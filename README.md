@@ -155,7 +155,7 @@ npm run build
 ## Contact
 
 - **GitHub**: [Tabibito-AI](https://github.com/Tabibito-AI)
-- **Portfolio**: [https://tabibitoai-3zbugsgo.manus.space](https://tabibitoai-3zbugsgo.manus.space)
+- **Portfolio**: [https://tabibitofolio-jzpuj53c.manus.space/](https://tabibitofolio-jzpuj53c.manus.space/)
 
 ## License
 
