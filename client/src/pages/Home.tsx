@@ -1,14 +1,29 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { APP_LOGO, APP_TITLE } from "@/const";
-import { Heart, Github, Mail, ExternalLink } from "lucide-react";
+import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
+import { Heart, Github, Mail, ExternalLink, Settings } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Link } from "wouter";
 
 const projects = [
   {
-    name: "AI Paper Navigator",
-    description: "arXivの論文を検索し、Abstractを翻訳して提供するアプリケーション",
+    name: "Tabibito Portfolio",
+    description: "Tabibito AI & Web Developer Portfolio - Full-stack web application built with React, TypeScript, and Tailwind CSS",
     language: "TypeScript",
-    url: "https://github.com/Tabibito-AI/ai-paper-navigator",
+    url: "https://github.com/Tabibito-AI/tabibito-portfolio",
+  },
+  {
+    name: "AI Transcribe Translate Summarize Manus",
+    description: "AI Presentation Notes - Real-time transcription, translation, and summarization powered by Deepgram and Manus LLM",
+    language: "TypeScript",
+    url: "https://github.com/Tabibito-AI/ai-transcribe-translate-summarize-manus",
+  },
+  {
+    name: "IELTS Asteroid Game",
+    description: "🚀タイピング力と英単語力を鍛えるIELTS語彙ゲーム🎮 ✔️英単語を素早くタイプして、飛来する小惑星を撃破💥 ✔️タイピングスキルと英単語の語彙力の両方が上達⚡️ ✔️ゲーム感覚で楽しく本格学習🎯",
+    language: "JavaScript",
+    url: "https://github.com/Tabibito-AI/ielts-asteroid-game",
   },
   {
     name: "AI Whiteboard Manus",
@@ -17,51 +32,111 @@ const projects = [
     url: "https://github.com/Tabibito-AI/ai-whiteboard-manus",
   },
   {
-    name: "Multi-Source Paper Navigator",
-    description: "複数の学術データベース（arXiv、PubMed）から論文を検索し、要約翻訳を提供するWebアプリケーション",
-    language: "TypeScript",
-    url: "https://github.com/Tabibito-AI/Multi-Source-Paper-Navigator",
-  },
-  {
-    name: "OpenAI ChatBot with Real-time API",
-    description: "OpenAIのリアルタイムAPIを使用した、音声コミュニケーション、カメラ映像認識、スクリーン認識ができるAIチャットボット",
-    language: "Python",
-    url: "https://github.com/Tabibito-AI/OpenAI-ChatBot-with-Real-time-API",
-  },
-  {
     name: "Paper Catcher2",
-    description: "学術論文を自動的に収集し、日本語で翻訳・要約して提供するモダンなウェブアプリケーション",
+    description: "Paper Catcher2は、学術論文を自動的に収集し、日本語で翻訳・要約して提供するモダンなウェブアプリケーションです。複数の学術データベースから論文を取得し、Google Gemini APIを使用して日本語翻訳を行い、GitHub Pagesで自動的に公開します。",
     language: "HTML",
     url: "https://github.com/Tabibito-AI/paper-catcher2",
   },
   {
-    name: "Talk Screen AI",
-    description: "Voice AI Chatbot with Screen Sharing for Mac OS。音声とスクリーン共有を組み合わせたAIアシスタント",
-    language: "Python",
-    url: "https://github.com/Tabibito-AI/Talk-Screen-AI",
-  },
-  {
-    name: "Talk Screen Gemini 2.5",
-    description: "最新のGemini 2.5 Flash Native Audio Live APIを使用した、音声チャットとスクリーンシェアを組み合わせたAIアシスタント",
-    language: "Python",
-    url: "https://github.com/Tabibito-AI/Talk-Screen-Gemini-2.5",
-  },
-  {
-    name: "Word to PDF Converter",
-    description: "大量のWordドキュメントをPDFに一括変換できるPythonツール",
-    language: "Python",
-    url: "https://github.com/Tabibito-AI/Word-to-PDF-Converter",
-  },
-  {
     name: "World Bank AI Dashboard",
-    description: "GitHub Actionsを活用したWorld Bank経済指標ダッシュボード。Gemini AIによる分析機能付き",
+    description: "GitHub Actionsを活用したWorld Bank経済指標ダッシュボード。Gemini AIによる分析機能付き。",
     language: "JavaScript",
-    url: "https://github.com/Tabibito-AI/World-Bank-AI-Dashboard",
+    url: "https://github.com/Tabibito-AI/world-bank-ai-dashboard",
+  },
+  {
+    name: "OpenAI ChatBot with Real-time API",
+    description: "このPythonコードは、OpenAIのAPIライブラリを使用して、リアルタイムの音声コミュニケーション、カメラ映像認識、スクリーン認識ができるAIチャットボットの基本的な機能を実装したものです。",
+    language: "Python",
+    url: "https://github.com/Tabibito-AI/OpenAI-ChatBot-with-Real-time-API",
+  },
+  {
+    name: "Multi-Source Paper Navigator",
+    description: "A web application that enables quick keyword search of research papers on multiple academic sources including arXiv and PubMed, and provides abstract translation.",
+    language: "TypeScript",
+    url: "https://github.com/Tabibito-AI/Multi-Source-Paper-Navigator",
+  },
+  {
+    name: "AI Paper Navigator",
+    description: "arXivの論文を検索し、Abstractを翻訳して提供するアプリケーション",
+    language: "TypeScript",
+    url: "https://github.com/Tabibito-AI/ai-paper-navigator",
   },
 ];
 
 export default function Home() {
-  const { user } = useAuth();
+  // The userAuth hooks provides authentication state
+  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  const { user, loading, error, isAuthenticated, logout } = useAuth();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast.error("Please enter your name");
+      return false;
+    }
+    if (!formData.email.trim()) {
+      toast.error("Please enter your email");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+    if (!formData.message.trim()) {
+      toast.error("Please enter a message");
+      return false;
+    }
+    if (formData.message.trim().length < 10) {
+      toast.error("Message must be at least 10 characters long");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Send message to backend
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      toast.success("Message sent successfully! Thank you for reaching out.");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      toast.error("Failed to send message. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
@@ -164,7 +239,7 @@ export default function Home() {
                 <h3 className="font-semibold text-slate-900 group-hover:text-rose-600 transition flex-1">{project.name}</h3>
                 <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-rose-600 transition flex-shrink-0 ml-2" />
               </div>
-              <p className="text-sm text-slate-600 mb-4 line-clamp-2">{project.description}</p>
+              <p className="text-sm text-slate-600 mb-4 line-clamp-5">{project.description}</p>
               <span className="inline-block px-2 py-1 bg-slate-100 text-xs text-slate-600 rounded">{project.language}</span>
             </a>
           ))}
@@ -179,35 +254,61 @@ export default function Home() {
             <p className="text-slate-600 mb-8">
               I'm always interested in hearing about new projects and opportunities. Feel free to reach out!
             </p>
-            <a
-              href="https://github.com/Tabibito-AI"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition"
-            >
-              <Github className="w-5 h-5" />
-              GitHub
-            </a>
+            <div className="space-y-4">
+              <a
+                href="https://github.com/Tabibito-AI"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition"
+              >
+                <Github className="w-5 h-5" />
+                GitHub
+              </a>
+              {user && user.role === "admin" && (
+                <Link href="/admin/messages">
+                  <a className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 text-white rounded-lg font-medium hover:bg-rose-700 transition ml-4">
+                    <Settings className="w-5 h-5" />
+                    Admin Messages
+                  </a>
+                </Link>
+              )}
+            </div>
           </div>
           <div className="bg-white p-8 rounded-lg border border-slate-200">
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <input
                 type="text"
+                name="name"
                 placeholder="Your Name"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                value={formData.name}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 disabled:bg-slate-50 disabled:text-slate-500"
               />
               <input
                 type="email"
+                name="email"
                 placeholder="Your Email"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 disabled:bg-slate-50 disabled:text-slate-500"
               />
               <textarea
+                name="message"
                 placeholder="Your Message"
                 rows={4}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                value={formData.message}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 disabled:bg-slate-50 disabled:text-slate-500"
               />
-              <Button className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:shadow-lg">
-                Send Message
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </div>
