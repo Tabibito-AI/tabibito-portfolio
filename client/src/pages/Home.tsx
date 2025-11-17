@@ -5,6 +5,7 @@ import { Heart, Github, Mail, ExternalLink, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
+import ProjectDetailModal from "@/components/ProjectDetailModal";
 
 const projects = [
   {
@@ -12,54 +13,80 @@ const projects = [
     description: "Tabibito AI & Web Developer Portfolio - Full-stack web application built with React, TypeScript, and Tailwind CSS",
     language: "TypeScript",
     url: "https://github.com/Tabibito-AI/tabibito-portfolio",
+    techStack: ["React", "TypeScript", "Tailwind CSS", "Node.js", "MySQL"],
+    features: ["Responsive design", "Project showcase", "Contact form", "Admin dashboard"],
+  },
+  {
+    name: "DigestPost",
+    description: "AI News Curator Bot for X (Twitter) - Automatically curates and posts news from major media outlets",
+    language: "TypeScript",
+    url: "https://github.com/Tabibito-AI/DigestPost",
+    techStack: ["TypeScript", "X API", "AI"],
+    features: ["News curation", "Automated posting", "Media integration"],
   },
   {
     name: "AI Transcribe Translate Summarize Manus",
     description: "AI Presentation Notes - Real-time transcription, translation, and summarization powered by Deepgram and Manus LLM",
     language: "TypeScript",
     url: "https://github.com/Tabibito-AI/ai-transcribe-translate-summarize-manus",
+    techStack: ["TypeScript", "Deepgram", "Manus LLM", "Real-time API"],
+    features: ["Real-time transcription", "Multi-language translation", "AI summarization"],
   },
   {
     name: "IELTS Asteroid Game",
     description: "🚀タイピング力と英単語力を鍛えるIELTS語彙ゲーム🎮 ✔️英単語を素早くタイプして、飛来する小惑星を撃破💥 ✔️タイピングスキルと英単語の語彙力の両方が上達⚡️ ✔️ゲーム感覚で楽しく本格学習🎯",
     language: "JavaScript",
     url: "https://github.com/Tabibito-AI/ielts-asteroid-game",
+    techStack: ["JavaScript", "Canvas API", "Game Engine"],
+    features: ["Interactive gameplay", "Vocabulary learning", "Typing practice", "Score tracking"],
   },
   {
     name: "AI Whiteboard Manus",
     description: "AI Whiteboard - Manusサーバー上で動作するAI連携ホワイトボードアプリケーション",
     language: "TypeScript",
     url: "https://github.com/Tabibito-AI/ai-whiteboard-manus",
+    techStack: ["TypeScript", "Canvas", "AI Integration"],
+    features: ["Digital drawing", "AI collaboration", "Real-time sync"],
   },
   {
     name: "Paper Catcher2",
     description: "Paper Catcher2は、学術論文を自動的に収集し、日本語で翻訳・要約して提供するモダンなウェブアプリケーションです。複数の学術データベースから論文を取得し、Google Gemini APIを使用して日本語翻訳を行い、GitHub Pagesで自動的に公開します。",
     language: "HTML",
     url: "https://github.com/Tabibito-AI/paper-catcher2",
+    techStack: ["HTML", "JavaScript", "Google Gemini API", "GitHub Pages"],
+    features: ["Paper collection", "Japanese translation", "Automatic summarization", "Multi-source support"],
   },
   {
     name: "World Bank AI Dashboard",
     description: "GitHub Actionsを活用したWorld Bank経済指標ダッシュボード。Gemini AIによる分析機能付き。",
     language: "JavaScript",
     url: "https://github.com/Tabibito-AI/world-bank-ai-dashboard",
+    techStack: ["JavaScript", "GitHub Actions", "Gemini AI", "Data Visualization"],
+    features: ["Economic indicators", "AI analysis", "Automated updates", "Interactive charts"],
   },
   {
     name: "OpenAI ChatBot with Real-time API",
     description: "このPythonコードは、OpenAIのAPIライブラリを使用して、リアルタイムの音声コミュニケーション、カメラ映像認識、スクリーン認識ができるAIチャットボットの基本的な機能を実装したものです。",
     language: "Python",
     url: "https://github.com/Tabibito-AI/OpenAI-ChatBot-with-Real-time-API",
+    techStack: ["Python", "OpenAI API", "Voice Processing", "Computer Vision"],
+    features: ["Voice communication", "Camera recognition", "Screen recognition", "Real-time processing"],
   },
   {
     name: "Multi-Source Paper Navigator",
     description: "A web application that enables quick keyword search of research papers on multiple academic sources including arXiv and PubMed, and provides abstract translation.",
     language: "TypeScript",
     url: "https://github.com/Tabibito-AI/Multi-Source-Paper-Navigator",
+    techStack: ["TypeScript", "React", "arXiv API", "PubMed API"],
+    features: ["Multi-source search", "Abstract translation", "Paper metadata", "Export functionality"],
   },
   {
     name: "AI Paper Navigator",
     description: "arXivの論文を検索し、Abstractを翻訳して提供するアプリケーション",
     language: "TypeScript",
     url: "https://github.com/Tabibito-AI/ai-paper-navigator",
+    techStack: ["TypeScript", "arXiv API", "Translation API"],
+    features: ["Paper search", "Abstract translation", "Metadata display", "Link to original"],
   },
 ];
 
@@ -74,6 +101,13 @@ export default function Home() {
     message: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleProjectClick = (project: any) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -228,12 +262,10 @@ export default function Home() {
         <h2 className="text-4xl font-bold text-slate-900 mb-12">Featured Projects</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <a
+            <button
               key={project.name}
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group p-6 bg-white rounded-lg border border-slate-200 hover:border-rose-300 hover:shadow-lg transition"
+              onClick={() => handleProjectClick(project)}
+              className="group p-6 bg-white rounded-lg border border-slate-200 hover:border-rose-300 hover:shadow-lg transition text-left cursor-pointer w-full"
             >
               <div className="flex justify-between items-start mb-3">
                 <h3 className="font-semibold text-slate-900 group-hover:text-rose-600 transition flex-1">{project.name}</h3>
@@ -241,7 +273,7 @@ export default function Home() {
               </div>
               <p className="text-sm text-slate-600 mb-4 line-clamp-5">{project.description}</p>
               <span className="inline-block px-2 py-1 bg-slate-100 text-xs text-slate-600 rounded">{project.language}</span>
-            </a>
+            </button>
           ))}
         </div>
       </section>
@@ -321,6 +353,12 @@ export default function Home() {
           <p>&copy; 2025 Tabibito. Built with passion and code.</p>
         </div>
       </footer>
+
+      <ProjectDetailModal
+        project={selectedProject}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
